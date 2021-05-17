@@ -1,4 +1,4 @@
-export const DISHES =
+ export const DISHES =
     [
         {
         id: 0,
@@ -184,3 +184,4 @@ export const DISHES =
         ]
         }
     ];
+    export default DISHES;
