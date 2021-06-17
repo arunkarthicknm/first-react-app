@@ -4,7 +4,7 @@ import {
     Button, Modal, ModalBody, ModalHeader, Label, Row, Col
 } from "reactstrap";
 
-import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Control, Form, Errors, actions} from 'react-redux-form';
 
 //// validators
 const required = (val) => val && val.length; //value > 0
@@ -29,7 +29,7 @@ class CommentForm extends Component{
     handleCommentFormSubmit(values) {
         console.log("Current State is: " + JSON.stringify(values));
         alert("Current State is: " + JSON.stringify(values));
-
+        this.props.resetFeedbackForm();
 
     }
 
@@ -53,7 +53,7 @@ class CommentForm extends Component{
                     <ModalHeader toggle={this.toggleCommentFormModal}> Submit Comment </ModalHeader>
                     <ModalBody>
                        
-                        <LocalForm onSubmit={(values) => this.handleCommentFormSubmit(values)}>
+                        <Form model="feedback" onSubmit={(values) => this.handleCommentFormSubmit(values)}>
                           
                             {/* rating */}
                             <Row className="form-group">
@@ -145,7 +145,7 @@ class CommentForm extends Component{
                                 </Col>
                             </Row>
 
-                        </LocalForm>
+                        </Form>
 
                     </ModalBody>
                 </Modal>
