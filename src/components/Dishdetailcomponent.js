@@ -5,6 +5,8 @@ import {
     Button, Modal, ModalBody, ModalHeader, Label, Row, Col
 } from "reactstrap";
 
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
+
 import { Control, LocalForm, Errors } from 'react-redux-form';
 
 import { Loading } from './LoadingComponent';
@@ -163,129 +165,127 @@ class CommentForm extends Component {
 /**........................ comment component ends ................................................. */
 
 
+ 
 
 
 
-
-
-
-    function RenderDish({dish}) {
-            
-
-        if (dish!=null){
-            return (
-                <div className='col-12 col-md-5 m-1'>
-                    <Card>
-                    <CardImg top src={baseUrl + dish.image} alt={dish.name} />
-                        <CardBody>
-                            <CardTitle> {dish.name}</CardTitle>
-                            <CardText> {dish.description} </CardText>
-                        </CardBody>
-                    </Card>
-                </div>   
-            );
-        }
-        else {
-            return (
-                <div></div>
-            );
-        }
-    }
-
-    function RenderComments({comments, postComment, dishId}) {
-      
-        if (comments == null) {
-            return (<div></div>)
-        }
-        const cmnts = comments.map(comment => {
-            return (
-                
-                <li key={comment.id}>
-                    <p>{comment.comment}</p>
-                    <p>-- {comment.author},
-                    &nbsp;
-                    {new Intl.DateTimeFormat('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: '2-digit'
-                    }).format(new Date(comment.date))}
-                    </p>
-                </li>
-
-            )
-        })
-        return (
-            <div className='col-12 col-md-5 m-1'>
-                <h4> Comments </h4>
-                <ul className='list-unstyled'>
-                    {cmnts}
-                </ul>
-                <CommentForm dishId={dishId}  postComment={postComment} />
-
-            </div>
-        )
-    }
-
-
-    const DishDetail = (props) => {
-
-        const dish = props.dish
-        
-    
-        if (dish == null) {
-            return (<div></div>);
-        }
-        if (props.isLoading) {
-            return(
-                <div className="container">
-                    <div className="row">            
-                        <Loading />
-                    </div>
-                </div>
-            );
-        }
-        else if (props.errMess) {
-            return(
-                <div className="container">
-                    <div className="row">            
-                        <h4>{props.errMess}</h4>
-                    </div>
-                </div>
-            );
-        }
-        else if (props.dish != null) {
-
-        return (
+const Dishdetail = ({dish,comments,postComment,isLoading,errMess})=>{
+    if (isLoading)
+    {
+        return(
             <div className="container">
-                <div className="row">
-                    <Breadcrumb>
-                        <BreadcrumbItem>
-                            <Link to="/menu">Menu</Link>
-                        </BreadcrumbItem>
-                        <BreadcrumbItem active>
-                            { props.dish.name }
-                        </BreadcrumbItem>
-                    </Breadcrumb>
-
-                    <div className="col-12">
-                        <h3> {props.dish.menu}</h3>
-                        <hr />
-                    </div>
-                </div>
-
-                <div className='row'>
-                    <RenderDish dish={ props.dish } />
-                    <RenderComments   comments={props.comments} postComment={props.postComment}
-        dishId={props.dish.id}
-      /> 
-                </div>
-
-
+            <div className="row">
+                <Loading />
             </div>
-        )
+            </div>
+        );
+    }
+    else if(errMess)
+    {
+        return(
+            <div className="container">
+            <div className="row">
+                <h4>{errMess}</h4>
+            </div>
+            </div>
+        );
+    }
+    else
+    {   
+        return ( 
+        <React.Fragment>  
+        <RenderDish dish={dish} comments={comments} postComment={postComment}/>
+        </React.Fragment>
+    );    
     }
 }
 
+function formatDate(date)
+{
+const option = {year: 'numeric', month: 'short', day: 'numeric' };
+const date1 = new Date(date)
+const newdate = date1.toLocaleDateString("en-US", option)
+return newdate;
+
+}
 
 
-export default DishDetail;
+const RenderComments =({comments,postComment,dishId}) =>
+{
+
+    if (comments!=null)
+    {
+        const com = comments.map(co=>{
+                
+                return(
+                <Fade in>
+                <li>{co.comment}</li><br />
+                <li>-- {co.author}, {formatDate(co.date)}</li><br />
+                </Fade>
+            )
+                
+            }
+            );
+        return(
+            <ul className="list-unstyled">
+            <Stagger in>
+            {com}
+            </Stagger>
+            <CommentForm dishId={dishId} postComment={postComment}/>
+            </ul>
+            
+        )
+    }
+    else{
+        return(<div></div>)
+    }
+}
+
+const RenderDish=({dish,comments,postComment})=>
+{
+    if (dish!=null)
+    {
+        return(
+        <div className="container">
+         <div className="row">
+        <Breadcrumb>
+            <BreadcrumbItem><Link to='/home'>Home</Link></BreadcrumbItem>
+            <BreadcrumbItem><Link to='/menu'>Menu</Link></BreadcrumbItem>
+            <BreadcrumbItem active>{dish.name}</BreadcrumbItem>
+        </Breadcrumb>
+        <div className="col-12 m-1">
+        <h3>{dish.name}</h3>
+        </div>
+        </div>
+        <div className="row">
+        <div className="col-12 col-md-5 m-1">
+        <FadeTransform in 
+        transformProps={{
+            exitTransform:'scale(0.5) translateY(-50%)'
+        }}>
+        <Card>
+            <CardImg width="100%" src={baseUrl+dish.image} alt={dish.name} />
+            <CardBody>
+                <CardTitle>{dish.name}</CardTitle>
+                <CardText>{dish.description}</CardText>
+            </CardBody>
+        </Card>
+        </FadeTransform>
+        </div>
+        <div className="col-12 col-md-5 m-1" >
+        <h4>Comments</h4>
+        
+        <RenderComments comments={comments}
+        postComment={postComment}
+        dishId={dish.id}/>
+        
+        </div>
+        </div>
+        </div >
+        )
+    }
+    else{
+        return(<div></div>)
+    }
+}
+export default Dishdetail;
